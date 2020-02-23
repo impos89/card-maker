@@ -8,9 +8,8 @@
 
 
 <style type="text/css">
-    canvas {
+     canvas {
         border: 1px solid black;
-        background: darkgray;
         width: 650px;
         height: 1016px;
     }
@@ -39,15 +38,7 @@
 
 </head>
 <body>
-
-    <div id = "container" class = "container">
-        <canvas id="bg_layer"></canvas>
-        <canvas id="fg_layer"></canvas>
-        
-    </div>
-    
-    <script src="./assets/card-editor.js"></script>
-    
+    <canvas id="c"></canvas>
     <div id="ui">
         <button id="button_previous">Poprzedni</button> ... <button id="button_next">Następny</button>
     </div>
@@ -60,5 +51,7 @@
              src="./assets/images/fists.png"
              width="300" height="227">
       </div>
+
+      <script src="./assets/scripts/bundle.js"></script>
 </body>
 </html>
