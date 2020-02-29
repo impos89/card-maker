@@ -29,6 +29,7 @@
     "webpack-dev-server": "^3.10.3"
   },
   "dependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
     "fabric": "^4.0.0-beta.7"
   }
 }
