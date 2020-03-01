@@ -285,50 +285,88 @@ class BossCardPrinter extends CardPrinter {
 
         var centerPoint = group.getCenterPoint()
 
-        fabric.Image.fromURL('../public/assets/images/players.png',
-            (imgPlayers) => {
-                const width = 512
-                imgPlayers.scale(0.1).set({
-                    left: 70,
-                    top: centerPoint.y - 70,
-                    width: width,
-                    height: width,
-                    originX: 'center',
-                    originY: 'center'
-                })
-                canvas.add(imgPlayers)
-                group.addWithUpdate(imgPlayers)
-            })
+        // fabric.Image.fromURL('../public/assets/images/players.png',
+        //     (imgPlayers) => {
+        //         const width = 512
+        //         imgPlayers.scale(0.1).set({
+        //             left: 70,
+        //             top: centerPoint.y - 70,
+        //             width: width,
+        //             height: width,
+        //             originX: 'center',
+        //             originY: 'center'
+        //         })
+        //         canvas.add(imgPlayers)
+        //         group.addWithUpdate(imgPlayers)
+        //     })
 
-        fabric.Image.fromURL('../public/assets/images/sword.png',
-            (imgDamage) => {
-                const width = 256
-                imgDamage.scale(0.18).set({
-                    left: 70,
-                    top: centerPoint.y,
-                    width: width,
-                    height: width,
-                    originX: 'center',
-                    originY: 'center'
-                })
-                canvas.add(imgDamage)
-                group.addWithUpdate(imgDamage)
-            })
+        // fabric.Image.fromURL('../public/assets/images/sword.png',
+        //     (imgDamage) => {
+        //         const width = 256
+        //         imgDamage.scale(0.18).set({
+        //             left: 70,
+        //             top: centerPoint.y,
+        //             width: width,
+        //             height: width,
+        //             originX: 'center',
+        //             originY: 'center'
+        //         })
+        //         canvas.add(imgDamage)
+        //         group.addWithUpdate(imgDamage)
+        //     })
 
-        fabric.Image.fromURL('../public/assets/images/hp.png',
-            (imgDamage) => {
-                const width = 512
-                imgDamage.scale(0.08).set({
-                    left: 70,
-                    top: centerPoint.y + 70,
-                    width: width,
-                    height: width,
-                    originX: 'center',
-                    originY: 'center'
-                })
-                canvas.add(imgDamage)
-                group.addWithUpdate(imgDamage)
-            })
+        // fabric.Image.fromURL('../public/assets/images/hp.png',
+        // (imgDamage) => {
+        //     const width = 512
+        //     imgDamage.scale(0.08).set({
+        //         left: 70,
+        //         top: centerPoint.y + 70,
+        //         width: width,
+        //         height: width,
+        //         originX: 'center',
+        //         originY: 'center'
+        //     })
+        //     canvas.add(imgDamage)
+        //     group.addWithUpdate(imgDamage)
+        // })
+
+        let imgHp = new fabric.Textbox('\uf21e', {
+            left: 50,
+            top: centerPoint.y + 40,        
+            fontFamily: 'Font Awesome 5 Free',
+            fontSize: 50,
+            fontWeight: 920,
+            width: 280,
+            height: 400,
+            fill: '#25120c',
+        })
+        let imgPlayers = new fabric.Textbox('\uf6de', {
+            left: 60,
+            top: centerPoint.y - 30,
+            fontFamily: 'Font Awesome 5 Free',
+            fontSize: 50,
+            fontWeight: 920,
+            width: 280,
+            height: 400,
+            fill: '#25120c',
+        })
+
+        let imgDamage = new fabric.Textbox('\uf500', {
+            left: 50,
+            top: centerPoint.y - 100,
+            fontFamily: 'Font Awesome 5 Free',
+            fontSize: 50,
+            fontWeight: 920,
+            width: 280,
+            height: 400,
+            fill: '#25120c',
+        })
+
+        group.addWithUpdate(imgHp)
+        group.addWithUpdate(imgPlayers)
+        group.addWithUpdate(imgDamage)
+
+
 
         const playerNumbers = ['3', '4', '5-6', '7-8']
         const dps = ['35', '50', '75', '100']
