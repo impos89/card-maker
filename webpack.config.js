@@ -1,3 +1,5 @@
+'use strict';
+
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const devMode = process.env.NODE_ENV !== 'production';
@@ -93,8 +95,25 @@ module.exports = {
             }
           }
         ]
+      },
+      {
+        test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+        loader: "url-loader?limit=10000&mimetype=application/font-woff",
+        options: {
+          name: "[name].[ext]",
+          outputPath: "fonts/"
+        }
+      },
+      {
+        test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+        loader: "file-loader",
+        options: {
+          name: "[name].[ext]",
+          outputPath: "fonts/"
+        }
       }
     ]
+
   },
   plugins: [
     // Configuration options for MiniCssExtractPlugin. Here I'm only
