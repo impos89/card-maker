@@ -2,26 +2,70 @@
 import { fabric } from 'fabric'
 import '@fortawesome/fontawesome-free/js/fontawesome'
 
-class Card {
-    id = 0
+class CardTemplate {
     type = 'none'
     deck = 'draft'
-    name = 'empty'
     dimensions = {
         width: 650,
         height: 1016
     }
 }
 
-class BossCard extends Card {
+class BossCardTemplate extends CardTemplate {
     type = 'boss'
     backgroundColor = '#e6daa6'
     labelColor = '#c94a3b'
     fontColor = '#25120c'
-    portrait = '../public/assets/images/1.png'
+}
+
+class Card {
+    constructor(obj) {
+        this.id = obj.id || 0
+        this.name = obj.name || 'unnamed'
+        this.template = obj.template || new CardTemplate()
+        this.data = {
+            portrait: '../public/assets/images/no_image.png',
+            stats: {
+                playerNumbers: ['0', '0', '0', '0'],
+                dps: ['0', '0', '0', '0'],
+                hp: ['0', '0', '0', '0'],
+                miserableEnd: 'No effect',
+                effect1: 'No effect',
+                reward: 'No reward'
+            }
+        }
+
+        if (obj.data) {
+            this.data.portrait = obj.data.portrait || '../public/assets/images/no_image.png' // TODO 'No Image'
+            if (obj.data.stats) {
+                this.data.stats.playerNumbers = obj.data.stats.playerNumbers || ['3', '4', '5-6', '7-8']
+                this.data.stats.dps = obj.data.stats.dps || ['0', '0', '0', '0']
+                this.data.stats.hp = obj.data.stats.hp || ['0', '0', '0', '0']
+                this.data.stats.miserableEnd = obj.data.stats.miserableEnd || 'No effect'
+                this.data.stats.effect1 = obj.data.stats.effect1 || 'No effect'
+                this.data.stats.reward = obj.data.stats.reward || 'No reward'
+            } else {
+                this.data.stats = {
+                    playerNumbers: ['0', '0', '0', '0'],
+                    dps: ['0', '0', '0', '0'],
+                    hp: ['0', '0', '0', '0'],
+                    miserableEnd: 'No effect',
+                    effect1: 'No effect',
+                    reward: 'No reward'
+                }
+            }
+        }
+    }
 }
 
 class CardPrinter {
+
+    glyphs = [
+        '\uf6de', /*players*/
+        '\uf21e', /*hp*/
+        '\uf500', /*damage*/
+    ]
+
     constructor(canvas, dimensions) {
         this.canvas = canvas
         this.dimensions = dimensions
@@ -163,17 +207,35 @@ class CardPrinter {
 
     drawTextWithIcons = (text, initialPosition) => {
 
-        
-        canvas.add(new fabric.Textbox(text, {
-            left: 340,
-            top: 200,
-            fontFamily: 'Font Awesome 5 Free',
-            fontSize: 25,
-            fontWeight: 920,
-            width: 280,
-            height: 400,
-            fill: '#25120c',
-        }))
+        let textbox = this.createTextboxWithGlyphs(text);
+        textbox.set('left', 340)
+        textbox.set('top', 200)
+        textbox.set('fontSize', 25)
+        textbox.set('width', 280)
+        textbox.set('height', 400)
+        textbox.set('fill', '#25120c')
+        canvas.add(textbox)
+    }
+
+    createTextboxWithGlyphs = (text) => {
+        let textbox = new fabric.Textbox(text, {
+            styles: { 0: {} }
+        })
+        this.applyStyleOnGlyphs(textbox)
+        return textbox
+    }
+
+    applyStyleOnGlyphs = (iText) => {
+        let text = iText.text
+        for (var index = 0; index < text.length; index++) {
+            if (this.glyphs.includes(text[index])) {
+                iText.styles["0"][index] =
+                {
+                    fontFamily: 'Font Awesome 5 Free',
+                    fontWeight: 900,
+                }
+            }
+        }
     }
 
     renderAll = () => {
@@ -187,38 +249,33 @@ class CardPrinter {
             })
         }
     }
-
-
 }
 
 class BossCardPrinter extends CardPrinter {
     print = (card) => {
-
-        if (!card instanceof BossCard) {
-            console.error("Current card" + card + " is not an instance of BossCard")
+        if (!card instanceof BossCardTemplate) {
+            console.error("Current card" + card + " is not an instance of BossCardTemplate")
         }
-
-        this.drawBackground(card.backgroundColor)
+        this.drawBackground(card.template.backgroundColor)
         this.drawBorder()
-        this.drawLabel("BOSS", 20, 50, 60, card.labelColor)
-        this.drawCirclePortrait(card.portrait)
-        this.drawLabel(card.deck, 965, 10, 30, card.labelColor)
+        this.drawLabel("BOSS", 20, 50, 60, card.template.labelColor)
+        this.drawCirclePortrait(card.data.portrait)
+        this.drawLabel(card.template.deck, 965, 10, 30, card.template.labelColor)
         this.drawBossName(card.name)
-        this.drawDamageBox()
-        this.drawLootBox()
-        this.drawMiserableEnd('Dodatkowe 8 Ran, Wszyscy tracą 2 poziomy')
-        this.drawTextWithIcons('+2\uf6de za każdy przedmiot na +0, walczących graczy')
+        this.drawDamageBox(card.data.stats)
+        this.drawLootBox(card.data.stats.reward)
+        this.drawMiserableEnd(card.data.stats.miserableEnd)
+        this.drawTextWithIcons(card.data.stats.effect1)
         this.renderAll()
     }
 
-    drawLootBox() {
+    drawLootBox(lootText) {
         let margin = 40
         let boxTop = 650
         let boxHeight = 180
-
         let lootTitle = 'Nagroda'
         let lootTitleFontSize = 40
-        let lootText = 'Boss Item, TradePack, kryształ, czar Boss Item, TradePack, kryształ, czar, 2 skarby dla gracza od drzwi. Poziom +2/+1'
+
         let lootTextFontSize = 30
 
         let rect = new fabric.Rect({
@@ -242,13 +299,12 @@ class BossCardPrinter extends CardPrinter {
         })
 
         let text = new fabric.Textbox(lootText, {
-            left: 20 - rect.width / 2,
+            left: (margin / 2) - rect.width / 2,
             top: loot.height,
-            width: rect.width,
+            width: rect.width - (margin / 2),
             height: rect.height,
             fontSize: lootTextFontSize,
             fill: '#25120c',
-            // originX: 'left',
         })
 
         let group = new fabric.Group([rect, loot, text], {
@@ -257,11 +313,10 @@ class BossCardPrinter extends CardPrinter {
             selectable: false,
         })
 
-        let centerPoint = group.getCenterPoint()
         canvas.add(group)
     }
 
-    drawDamageBox = () => {
+    drawDamageBox = (stats) => {
         let margin = 40
         let boxTop = 400
         let boxHeight = 240
@@ -284,55 +339,9 @@ class BossCardPrinter extends CardPrinter {
         })
 
         var centerPoint = group.getCenterPoint()
-
-        // fabric.Image.fromURL('../public/assets/images/players.png',
-        //     (imgPlayers) => {
-        //         const width = 512
-        //         imgPlayers.scale(0.1).set({
-        //             left: 70,
-        //             top: centerPoint.y - 70,
-        //             width: width,
-        //             height: width,
-        //             originX: 'center',
-        //             originY: 'center'
-        //         })
-        //         canvas.add(imgPlayers)
-        //         group.addWithUpdate(imgPlayers)
-        //     })
-
-        // fabric.Image.fromURL('../public/assets/images/sword.png',
-        //     (imgDamage) => {
-        //         const width = 256
-        //         imgDamage.scale(0.18).set({
-        //             left: 70,
-        //             top: centerPoint.y,
-        //             width: width,
-        //             height: width,
-        //             originX: 'center',
-        //             originY: 'center'
-        //         })
-        //         canvas.add(imgDamage)
-        //         group.addWithUpdate(imgDamage)
-        //     })
-
-        // fabric.Image.fromURL('../public/assets/images/hp.png',
-        // (imgDamage) => {
-        //     const width = 512
-        //     imgDamage.scale(0.08).set({
-        //         left: 70,
-        //         top: centerPoint.y + 70,
-        //         width: width,
-        //         height: width,
-        //         originX: 'center',
-        //         originY: 'center'
-        //     })
-        //     canvas.add(imgDamage)
-        //     group.addWithUpdate(imgDamage)
-        // })
-
         let imgHp = new fabric.Textbox('\uf21e', {
             left: 50,
-            top: centerPoint.y + 40,        
+            top: centerPoint.y + 40,
             fontFamily: 'Font Awesome 5 Free',
             fontSize: 50,
             fontWeight: 920,
@@ -350,7 +359,6 @@ class BossCardPrinter extends CardPrinter {
             height: 400,
             fill: '#25120c',
         })
-
         let imgDamage = new fabric.Textbox('\uf500', {
             left: 50,
             top: centerPoint.y - 100,
@@ -366,14 +374,9 @@ class BossCardPrinter extends CardPrinter {
         group.addWithUpdate(imgPlayers)
         group.addWithUpdate(imgDamage)
 
-
-
-        const playerNumbers = ['3', '4', '5-6', '7-8']
-        const dps = ['35', '50', '75', '100']
-        const hp = ['45', '60', '90', '120']
         const pixelsAboveBox = 70
-        for (var i = 0; i < playerNumbers.length; i++) {
-            var playerNumber = new fabric.Text(playerNumbers[i],
+        for (var i = 0; i < stats.playerNumbers.length; i++) {
+            var playerNumber = new fabric.Text(stats.playerNumbers[i],
                 {
                     left: 150 + 130 * i,
                     fontWeight: 'bold',
@@ -384,7 +387,7 @@ class BossCardPrinter extends CardPrinter {
                 })
             canvas.add(playerNumber)
             group.addWithUpdate(playerNumber)
-            var dpsNumber = new fabric.Text(dps[i],
+            var dpsNumber = new fabric.Text(stats.dps[i],
                 {
                     left: 150 + 130 * i,
                     top: centerPoint.y,
@@ -394,7 +397,7 @@ class BossCardPrinter extends CardPrinter {
                 })
             canvas.add(dpsNumber)
             group.addWithUpdate(dpsNumber)
-            var hpNumber = new fabric.Text(hp[i],
+            var hpNumber = new fabric.Text(stats.hp[i],
                 {
                     left: 150 + 130 * i,
                     top: centerPoint.y + 70,
@@ -421,21 +424,39 @@ class BossCardPrinter extends CardPrinter {
 }
 
 let getCardPrinter = (canvas, card) => {
-    switch (card.type) {
-        case 'boss': return new BossCardPrinter(canvas, card.dimensions)
-        default: console.log.error('Unhandled card type')
+    switch (card.template.type) {
+        case 'boss': return new BossCardPrinter(canvas, card.template.dimensions)
+        default: console.error('Unhandled card type')
     }
 }
 //-----------demo card------------------
-let card = new BossCard()
-card.id = 1
-card.name = 'BHEG'
+let card = new Card({
+    id: 1,
+    name: 'BHEG',
+    template: new BossCardTemplate(),
+    data: {
+        portrait : '../public/assets/images/1.png',
+        stats: {
+        playerNumbers: ['3', '4', '5-6', '7-8'],
+        dps: ['35', '50', '75', '100'],
+        hp: ['45', '60', '90', '120'],
+        miserableEnd: 'Dodatkowe 8 Ran, Wszyscy tracą 2 poziomy',
+        effect1: '+2 \uf6de za każdy przedmiot na +0, walczących graczy',
+        reward: 'Boss Item, TradePack, kryształ, czar, 2 skarby dla gracza od drzwi. Poziom +2/+1'
+        }
+    }
+})
+
+
+
+
+
 //-----------demo card------------------
 
 //------------canvas setup---------------
 let canvas = new fabric.Canvas('c')
-canvas.setWidth(card.dimensions.width)
-canvas.setHeight(card.dimensions.height)
+canvas.setWidth(card.template.dimensions.width)
+canvas.setHeight(card.template.dimensions.height)
 //------------canvas setup---------------
 
 
