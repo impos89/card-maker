@@ -16,12 +16,27 @@ class BossCardTemplate extends CardTemplate {
     backgroundColor = '#e6daa6'
     labelColor = '#c94a3b'
     fontColor = '#25120c'
+    borderProperties = {
+        outerBorderColor: '#25120c',
+        innerBorderColor: '#c94a3b'
+    }
+}
+
+class QuestCardTemplate extends CardTemplate {
+    type = 'quest'
+    backgroundColor = '#fec657'
+    labelColor = '#fec657'
+    fontColor = '#25120c'
+    borderProperties = {
+        outerBorderColor: '#25120c',
+        innerBorderColor: '#25120c'
+    }
 }
 
 class Card {
     constructor(obj) {
         this.id = obj.id || 0
-        this.name = obj.name || 'unnamed'
+        this.title = obj.title || 'unnamed'
         this.template = obj.template || new CardTemplate()
         this.data = {
             portrait: '../public/assets/images/no_image.png',
@@ -73,7 +88,7 @@ class CardPrinter {
 
     print = (card) => { console.log("Abstract card printer - print called does nothing") }
 
-    drawCirclePortrait = (url) => {
+    drawCirclePortrait = (url, style) => {
         let width = 250
         fabric.Image.fromURL(url,
             function (oImg) {
@@ -104,8 +119,8 @@ class CardPrinter {
                 canvas.add(oImg)
 
                 var group = new fabric.Group([stroke, oImg], {
-                    left: 45,
-                    top: 90,
+                    left: style.left,
+                    top: style.top,
                     selectable: false
                 })
                 canvas.add(group)
@@ -158,12 +173,12 @@ class CardPrinter {
             }))
     }
 
-    drawBorder = () => {
+    drawBorder = (style) => {
         var outerBorder = (drawBorder(0, 0, this.dimensions.width, this.dimensions.height, 30))
-        outerBorder.stroke = '#25120c'
+        outerBorder.stroke = style.outerBorderColor
 
         var innerBorder = drawBorder(15, 15, this.dimensions.width - 30, this.dimensions.height - 30, 15)
-        innerBorder.stroke = '#c94a3b'
+        innerBorder.stroke = style.innerBorderColor
 
         canvas.add(outerBorder)
         canvas.add(innerBorder)
@@ -205,68 +220,19 @@ class CardPrinter {
         }))
     }
 
-    drawTextWithIcons = (text, initialPosition) => {
-
+    drawTextWithIcons = (text, style) => {
+        if (!text) {
+            console.warn('Text passed to drawTextWithIcons function is ' + text)
+            text = ''
+        }
         let textbox = this.createTextboxWithGlyphs(text);
-        textbox.set('left', 340)
-        textbox.set('top', 200)
-        textbox.set('fontSize', 25)
-        textbox.set('width', 280)
-        textbox.set('height', 400)
+        textbox.set('left', style.left)
+        textbox.set('top', style.top)
+        textbox.set('fontSize', style.fontSize)
+        textbox.set('width', style.width)
+        textbox.set('height', style.height)
         textbox.set('fill', '#25120c')
         canvas.add(textbox)
-    }
-
-    createTextboxWithGlyphs = (text) => {
-        let textbox = new fabric.Textbox(text, {
-            styles: { 0: {} }
-        })
-        this.applyStyleOnGlyphs(textbox)
-        return textbox
-    }
-
-    applyStyleOnGlyphs = (iText) => {
-        let text = iText.text
-        for (var index = 0; index < text.length; index++) {
-            if (this.glyphs.includes(text[index])) {
-                iText.styles["0"][index] =
-                {
-                    fontFamily: 'Font Awesome 5 Free',
-                    fontWeight: 900,
-                }
-            }
-        }
-    }
-
-    renderAll = () => {
-        disableSelections()
-        canvas.renderAll()
-
-        function disableSelections() {
-            canvas.selection = false
-            canvas.forEachObject(function (o) {
-                o.selectable = false
-            })
-        }
-    }
-}
-
-class BossCardPrinter extends CardPrinter {
-    print = (card) => {
-        if (!card instanceof BossCardTemplate) {
-            console.error("Current card" + card + " is not an instance of BossCardTemplate")
-        }
-        this.drawBackground(card.template.backgroundColor)
-        this.drawBorder()
-        this.drawLabel("BOSS", 20, 50, 60, card.template.labelColor)
-        this.drawCirclePortrait(card.data.portrait)
-        this.drawLabel(card.template.deck, 965, 10, 30, card.template.labelColor)
-        this.drawBossName(card.name)
-        this.drawDamageBox(card.data.stats)
-        this.drawLootBox(card.data.stats.reward)
-        this.drawMiserableEnd(card.data.stats.miserableEnd)
-        this.drawTextWithIcons(card.data.stats.effect1)
-        this.renderAll()
     }
 
     drawLootBox(lootText) {
@@ -314,6 +280,64 @@ class BossCardPrinter extends CardPrinter {
         })
 
         canvas.add(group)
+    }
+
+    createTextboxWithGlyphs = (text) => {
+        let textbox = new fabric.Textbox(text, {
+            styles: { 0: {} }
+        })
+        this.applyStyleOnGlyphs(textbox)
+        return textbox
+    }
+
+    applyStyleOnGlyphs = (iText) => {
+        let text = iText.text
+        for (var index = 0; index < text.length; index++) {
+            if (this.glyphs.includes(text[index])) {
+                iText.styles["0"][index] =
+                {
+                    fontFamily: 'Font Awesome 5 Free',
+                    fontWeight: 900,
+                }
+            }
+        }
+    }
+
+    renderAll = () => {
+        disableSelections()
+        canvas.renderAll()
+
+        function disableSelections() {
+            canvas.selection = false
+            canvas.forEachObject(function (o) {
+                o.selectable = false
+            })
+        }
+    }
+}
+
+class BossCardPrinter extends CardPrinter {
+    print = (card) => {
+        if (!card instanceof BossCardTemplate) {
+            console.error("Current card" + card + " is not an instance of BossCardTemplate")
+        }
+        this.drawBackground(card.template.backgroundColor)
+        this.drawBorder(card.template.borderProperties)
+        this.drawLabel("BOSS", 20, 50, 60, card.template.labelColor)
+        this.drawCirclePortrait(card.data.portrait, {left: 45, top: 90})
+        this.drawLabel(card.template.deck, 965, 10, 30, card.template.labelColor)
+        this.drawBossName(card.title)
+        this.drawDamageBox(card.data.stats)
+        this.drawLootBox(card.data.stats.reward)
+        this.drawMiserableEnd(card.data.stats.miserableEnd)
+        this.drawTextWithIcons(card.data.stats.effect1, {
+            left: 340,
+            top: 200,
+            fontSize: 25,
+            width: 280,
+            height: 400
+        })
+        this.renderAll()
     }
 
     drawDamageBox = (stats) => {
@@ -423,35 +447,62 @@ class BossCardPrinter extends CardPrinter {
     }
 }
 
+class QuestCardPrinter extends CardPrinter {
+    print = (card) => {
+        if (!card instanceof QuestCardTemplate) {
+            console.error("Current card" + card + " is not an instance of BossCardTemplate")
+        }
+        this.drawBackground(card.template.backgroundColor)
+        this.drawBorder(card.template.borderProperties)
+        this.drawLabel("QUEST", 30, 50, 60, card.template.labelColor)
+        this.drawTextWithIcons(card.title, { left: card.template.dimensions.width / 4, top: 150, fontSize: 25, width: 400, height: 400 })
+        this.drawCirclePortrait(card.data.portrait, {left: card.template.dimensions.width / 2 - 125, top: 200})
+        this.drawLootBox(card.data.stats.reward)
+        this.drawLabel(card.template.deck, 945, 10, 30, card.template.labelColor)
+        this.renderAll()
+    }
+}
+
 let getCardPrinter = (canvas, card) => {
     switch (card.template.type) {
         case 'boss': return new BossCardPrinter(canvas, card.template.dimensions)
+        case 'quest': return new QuestCardPrinter(canvas, card.template.dimensions)
         default: console.error('Unhandled card type')
     }
 }
-//-----------demo card------------------
+//-----------demo card - Bheg------------------
+// let card = new Card
+// ({
+//     id: 1,
+//     title: 'BHEG',
+//     template: new BossCardTemplate(),
+//     data: {
+//         portrait: '../public/assets/images/1.png',
+//         stats: {
+//             playerNumbers: ['3', '4', '5-6', '7-8'],
+//             dps: ['35', '50', '75', '100'],
+//             hp: ['45', '60', '90', '120'],
+//             miserableEnd: 'Dodatkowe 8 Ran, Wszyscy tracą 2 poziomy',
+//             effect1: '+2 \uf6de za każdy przedmiot na +0, walczących graczy',
+//             reward: 'Boss Item, TradePack, kryształ, czar, 2 skarby dla gracza od drzwi. Poziom +2/+1'
+//         }
+//     }
+// })
+//-----------demo card - Bheg------------------
+
+//-----------demo card - Quest------------------
 let card = new Card({
     id: 1,
-    name: 'BHEG',
-    template: new BossCardTemplate(),
+    title: 'POMÓŻ INNEMU GRACZOWI',
+    template: new QuestCardTemplate(),
     data: {
-        portrait : '../public/assets/images/1.png',
+        portrait: '../public/assets/images/question_mark.png',
         stats: {
-        playerNumbers: ['3', '4', '5-6', '7-8'],
-        dps: ['35', '50', '75', '100'],
-        hp: ['45', '60', '90', '120'],
-        miserableEnd: 'Dodatkowe 8 Ran, Wszyscy tracą 2 poziomy',
-        effect1: '+2 \uf6de za każdy przedmiot na +0, walczących graczy',
-        reward: 'Boss Item, TradePack, kryształ, czar, 2 skarby dla gracza od drzwi. Poziom +2/+1'
+            reward: '+1 poziom'
         }
     }
 })
-
-
-
-
-
-//-----------demo card------------------
+//-----------demo card - Quest------------------
 
 //------------canvas setup---------------
 let canvas = new fabric.Canvas('c')
