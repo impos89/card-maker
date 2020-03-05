@@ -324,7 +324,7 @@ class BossCardPrinter extends CardPrinter {
         this.drawBackground(card.template.backgroundColor)
         this.drawBorder(card.template.borderProperties)
         this.drawLabel("BOSS", 20, 50, 60, card.template.labelColor)
-        this.drawCirclePortrait(card.data.portrait, {left: 45, top: 90})
+        this.drawCirclePortrait(card.data.portrait, { left: 45, top: 90 })
         this.drawLabel(card.template.deck, 965, 10, 30, card.template.labelColor)
         this.drawBossName(card.title)
         this.drawDamageBox(card.data.stats)
@@ -456,7 +456,7 @@ class QuestCardPrinter extends CardPrinter {
         this.drawBorder(card.template.borderProperties)
         this.drawLabel("QUEST", 30, 50, 60, card.template.labelColor)
         this.drawTextWithIcons(card.title, { left: card.template.dimensions.width / 4, top: 150, fontSize: 25, width: 400, height: 400 })
-        this.drawCirclePortrait(card.data.portrait, {left: card.template.dimensions.width / 2 - 125, top: 200})
+        this.drawCirclePortrait(card.data.portrait, { left: card.template.dimensions.width / 2 - 125, top: 200 })
         this.drawLootBox(card.data.stats.reward)
         this.drawLabel(card.template.deck, 945, 10, 30, card.template.labelColor)
         this.renderAll()
@@ -464,34 +464,38 @@ class QuestCardPrinter extends CardPrinter {
 }
 
 let getCardPrinter = (canvas, card) => {
+    const bossCardPrinter = new BossCardPrinter(canvas, card.template.dimensions)
+    const questCardPrinter = new QuestCardPrinter(canvas, card.template.dimensions)
+
+    new QuestCardPrinter(canvas, card.template.dimensions)
+
     switch (card.template.type) {
-        case 'boss': return new BossCardPrinter(canvas, card.template.dimensions)
-        case 'quest': return new QuestCardPrinter(canvas, card.template.dimensions)
-        default: console.error('Unhandled card type')
+        case 'boss': return bossCardPrinter
+        case 'quest': return questCardPrinter
+        default: console.error('Unhandled card type: ' + card.template.type)
     }
 }
 //-----------demo card - Bheg------------------
-// let card = new Card
-// ({
-//     id: 1,
-//     title: 'BHEG',
-//     template: new BossCardTemplate(),
-//     data: {
-//         portrait: '../public/assets/images/1.png',
-//         stats: {
-//             playerNumbers: ['3', '4', '5-6', '7-8'],
-//             dps: ['35', '50', '75', '100'],
-//             hp: ['45', '60', '90', '120'],
-//             miserableEnd: 'Dodatkowe 8 Ran, Wszyscy tracą 2 poziomy',
-//             effect1: '+2 \uf6de za każdy przedmiot na +0, walczących graczy',
-//             reward: 'Boss Item, TradePack, kryształ, czar, 2 skarby dla gracza od drzwi. Poziom +2/+1'
-//         }
-//     }
-// })
-//-----------demo card - Bheg------------------
+let card1 = new Card
+    ({
+        id: 1,
+        title: 'BHEG',
+        template: new BossCardTemplate(),
+        data: {
+            portrait: '../public/assets/images/1.png',
+            stats: {
+                playerNumbers: ['3', '4', '5-6', '7-8'],
+                dps: ['35', '50', '75', '100'],
+                hp: ['45', '60', '90', '120'],
+                miserableEnd: 'Dodatkowe 8 Ran, Wszyscy tracą 2 poziomy',
+                effect1: '+2 \uf6de za każdy przedmiot na +0, walczących graczy',
+                reward: 'Boss Item, TradePack, kryształ, czar, 2 skarby dla gracza od drzwi. Poziom +2/+1'
+            }
+        }
+    })
 
 //-----------demo card - Quest------------------
-let card = new Card({
+let card2 = new Card({
     id: 1,
     title: 'POMÓŻ INNEMU GRACZOWI',
     template: new QuestCardTemplate(),
@@ -502,20 +506,47 @@ let card = new Card({
         }
     }
 })
-//-----------demo card - Quest------------------
+
+//----Keep all cards in one list-----//
+const cards = [card1, card2]
+let cardIndex = 0
+let currentCard = cards[cardIndex]
 
 //------------canvas setup---------------
 let canvas = new fabric.Canvas('c')
-canvas.setWidth(card.template.dimensions.width)
-canvas.setHeight(card.template.dimensions.height)
-//------------canvas setup---------------
-
+canvas.setWidth(currentCard.template.dimensions.width)
+canvas.setHeight(currentCard.template.dimensions.height)
 
 //-------------print card----------------
-let printer = getCardPrinter(canvas, card)
-printer.print(card)
-//-------------print card----------------
+let printer = getCardPrinter(canvas, currentCard)
+printer.print(cards[cardIndex])
 
+//---- selection button handlers
+var buttonPrevious = document.getElementById("button_previous")
+buttonPrevious.addEventListener('click', (e) => {
+    if (cardIndex == 0) {
+        cardIndex = cards.length - 1
+    } else {
+        cardIndex -= 1
+    }
+    currentCard = cards[cardIndex]
+
+    getCardPrinter(canvas, currentCard)
+        .print(currentCard)
+})
+
+var buttonNext = document.getElementById("button_next")
+buttonNext.addEventListener('click', (e) => {
+    if (cardIndex == cards.length - 1) {
+        cardIndex = 0
+    } else {
+        cardIndex += 1
+    }
+
+    currentCard = cards[cardIndex]
+    getCardPrinter(canvas, currentCard)
+        .print(currentCard)
+})
 
 // TODO remove not common part - images, text from template and use it later
 
