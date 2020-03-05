@@ -33,6 +33,28 @@ class QuestCardTemplate extends CardTemplate {
     }
 }
 
+class ItemCardTemplate extends CardTemplate {
+    type = 'item'
+    backgroundColor = '#fec657'
+    labelColor = '#fec657'
+    fontColor = '#25120c'
+    borderProperties = {
+        outerBorderColor: '#25120c',
+        innerBorderColor: '#25120c'
+    }
+}
+
+class BossItemCardTemplate extends ItemCardTemplate {
+    type = 'boss item'
+    backgroundColor = '#cd7f73'
+    labelColor = '#b56e63'
+    fontColor = '#25120c'
+    borderProperties = {
+        outerBorderColor: '#25120c',
+        innerBorderColor: '#25120c'
+    }
+}
+
 class Card {
     constructor(obj) {
         this.id = obj.id || 0
@@ -59,6 +81,12 @@ class Card {
                 this.data.stats.miserableEnd = obj.data.stats.miserableEnd || 'No effect'
                 this.data.stats.effect1 = obj.data.stats.effect1 || 'No effect'
                 this.data.stats.reward = obj.data.stats.reward || 'No reward'
+                this.data.stats.bonus = obj.data.stats.bonus || 'No bonus' // item only
+                this.data.stats.strength = obj.data.stats.strength || 0 // item only
+                this.data.stats.power = obj.data.stats.power || 0 // item only
+                this.data.stats.shield = obj.data.stats.shield || 0 // item only
+                this.data.stats.type = obj.data.stats.type || ['Zbroja', 'Duża'] // item only
+                this.data.stats.value = obj.data.stats.value || 0 // item only
             } else {
                 this.data.stats = {
                     playerNumbers: ['0', '0', '0', '0'],
@@ -66,8 +94,12 @@ class Card {
                     hp: ['0', '0', '0', '0'],
                     miserableEnd: 'No effect',
                     effect1: 'No effect',
-                    reward: 'No reward'
+                    reward: 'No reward',
+                    bonus: 'No bonus'
                 }
+            }
+            if (obj.data.descriptions) {
+                this.data.descriptions = obj.data.descriptions || { 0: '', 1: '', 2: '' }
             }
         }
     }
@@ -79,6 +111,7 @@ class CardPrinter {
         '\uf6de', /*players*/
         '\uf21e', /*hp*/
         '\uf500', /*damage*/
+        '\uf496', /*lock*/
     ]
 
     constructor(canvas, dimensions) {
@@ -232,6 +265,7 @@ class CardPrinter {
         textbox.set('width', style.width)
         textbox.set('height', style.height)
         textbox.set('fill', '#25120c')
+        textbox.set('textAlign', 'center')
         canvas.add(textbox)
     }
 
@@ -323,7 +357,7 @@ class BossCardPrinter extends CardPrinter {
         }
         this.drawBackground(card.template.backgroundColor)
         this.drawBorder(card.template.borderProperties)
-        this.drawLabel("BOSS", 20, 50, 60, card.template.labelColor)
+        this.drawLabel(card.template.type, 20, 50, 60, card.template.labelColor)
         this.drawCirclePortrait(card.data.portrait, { left: 45, top: 90 })
         this.drawLabel(card.template.deck, 965, 10, 30, card.template.labelColor)
         this.drawBossName(card.title)
@@ -454,8 +488,8 @@ class QuestCardPrinter extends CardPrinter {
         }
         this.drawBackground(card.template.backgroundColor)
         this.drawBorder(card.template.borderProperties)
-        this.drawLabel("QUEST", 30, 50, 60, card.template.labelColor)
-        this.drawTextWithIcons(card.title, { left: card.template.dimensions.width / 4, top: 150, fontSize: 25, width: 400, height: 400 })
+        this.drawLabel(card.template.type, 30, 50, 60, card.template.labelColor)
+        this.drawTextWithIcons(card.title, { left: 0, top: 150, fontSize: 25, width: card.template.dimensions.width, height: 400 })
         this.drawCirclePortrait(card.data.portrait, { left: card.template.dimensions.width / 2 - 125, top: 200 })
         this.drawLootBox(card.data.stats.reward)
         this.drawLabel(card.template.deck, 945, 10, 30, card.template.labelColor)
@@ -463,20 +497,120 @@ class QuestCardPrinter extends CardPrinter {
     }
 }
 
+class ItemCardPrinter extends CardPrinter {
+    print = (card) => {
+        if (!card instanceof QuestCardTemplate) {
+            console.error("Current card" + card + " is not an instance of BossCardTemplate")
+        }
+        this.drawBackground(card.template.backgroundColor)
+        this.drawBorder(card.template.borderProperties)
+        this.drawLabel(card.template.type, 30, 50, 60, card.template.labelColor)
+
+        this.drawTextWithIcons(card.data.stats.bonus, { left: 0, top: 100, fontSize: 35, width: card.template.dimensions.width, height: 400, textAlign: "center" })
+        this.drawTextWithIcons(card.title, { left: 0, top: 210, fontSize: 35, width: card.template.dimensions.width, height: 400, textAlign: "center" })
+        this.drawCirclePortrait(card.data.portrait, { left: card.template.dimensions.width / 2 - 125, top: 250 })
+        this.drawTextWithIcons(card.data.descriptions[0], { left: 0, top: 520, fontSize: 25, width: card.template.dimensions.width, height: 100, textAlign: "center" })
+        this.drawStatsBox(card.data.stats)
+
+        let types = card.data.stats.type
+            .filter(function (word) {
+                return word != null;
+            })
+            .join('\n')
+        this.drawTextWithIcons(types, { left: 0, top: 850, fontSize: 35, width: 200, height: 100 })
+        this.drawLabel(card.template.deck, 945, 10, 30, card.template.labelColor)
+        this.drawTextWithIcons('' + card.data.stats.value + ' sztuk złota', { left: 150, top: 900, fontSize: 35, width: card.template.dimensions.width, height: 100, textAlign: 'right' })
+        this.renderAll()
+    }
+
+
+    drawStatsBox = (stats) => {
+        let margin = 40
+        let boxTop = 600
+        let boxHeight = 160
+
+        let padding3Letters = (string) => {
+            switch (string.toString(10).length) {
+                case 0: return '   '
+                case 1: return ' ' + string + ' '
+                case 2: return ' ' + string
+                default: return string
+            }
+        }
+
+        let rectWidth = this.dimensions.width - margin * 2
+        var rect = new fabric.Rect({
+            width: this.dimensions.width - margin * 2,
+            height: boxHeight,
+            stroke: '#25120c',
+            strokeWidth: 2,
+            fill: 'white',
+            rx: 15,
+            ry: 0
+        })
+        canvas.add(rect)
+
+        let armorIcon = new fabric.Textbox('\uf553\n' + padding3Letters(stats.strength), {
+            fontFamily: 'Font Awesome 5 Free',
+            top: 20,
+            fontSize: 50,
+            fontWeight: 920,
+            left: margin,
+            width: rectWidth,
+            fill: '#25120c',
+        })
+
+        let dmgIcon = new fabric.Textbox('\uf6de\n' + padding3Letters(stats.power), {
+            fontFamily: 'Font Awesome 5 Free',
+            top: 20,
+            fontSize: 50,
+            fontWeight: 920,
+            width: rectWidth,
+            textAlign: 'center',
+            fill: '#25120c',
+        })
+
+        let shieldIcon = new fabric.Textbox('\uf3ed\n' + padding3Letters(stats.shield), {
+            fontFamily: 'Font Awesome 5 Free',
+            top: 20,
+            fontSize: 50,
+            fontWeight: 920,
+            width: rectWidth - margin,
+            textAlign: 'right',
+            fill: '#25120c',
+        })
+
+
+        var group = new fabric.Group([rect, shieldIcon, dmgIcon, armorIcon], {
+            left: margin,
+            top: boxTop,
+            selectable: false
+        })
+        canvas.add(group)
+
+
+
+    }
+}
+
 let getCardPrinter = (canvas, card) => {
     const bossCardPrinter = new BossCardPrinter(canvas, card.template.dimensions)
     const questCardPrinter = new QuestCardPrinter(canvas, card.template.dimensions)
+    const itemCardPrinter = new ItemCardPrinter(canvas, card.template.dimensions)
+
 
     new QuestCardPrinter(canvas, card.template.dimensions)
 
     switch (card.template.type) {
         case 'boss': return bossCardPrinter
         case 'quest': return questCardPrinter
+        case 'item': return itemCardPrinter
+        case 'boss item': return itemCardPrinter
         default: console.error('Unhandled card type: ' + card.template.type)
     }
 }
 //-----------demo card - Bheg------------------
-let card1 = new Card
+let bossCard = new Card
     ({
         id: 1,
         title: 'BHEG',
@@ -495,8 +629,8 @@ let card1 = new Card
     })
 
 //-----------demo card - Quest------------------
-let card2 = new Card({
-    id: 1,
+let questCard = new Card({
+    id: 2,
     title: 'POMÓŻ INNEMU GRACZOWI',
     template: new QuestCardTemplate(),
     data: {
@@ -507,9 +641,53 @@ let card2 = new Card({
     }
 })
 
+//-----------demo card - Item------------------
+let itemCard = new Card({
+    id: 3,
+    title: 'CIEPLUTKIE KALESONIKI',
+    template: new ItemCardTemplate(),
+    data: {
+        portrait: '../public/assets/images/item_1.png',
+        stats: {
+            value: 600,
+            type: ['Zbroja', 'Duża'],
+            bonus: 'Bonus +1\n Nie dla Mage',
+            strength: 2,
+            power: 0,
+            shield: 3
+        },
+        descriptions: {
+            0: 'Zobacz jak na Tobie leżą!'
+        }
+
+    }
+})
+
+//-----------demo card - Boss Item------------------
+let bossItemCard = new Card({
+    id: 4,
+    title: 'ZBROJA Z DYWANU',
+    template: new BossItemCardTemplate(),
+    data: {
+        portrait: '../public/assets/images/item_2.png',
+        stats: {
+            value: 600,
+            type: ['Zbroja'],
+            bonus: 'Bonus +1',
+            strength: 1,
+            power: 1,
+            shield: 2
+        },
+        descriptions: {
+            0: 'Kiedy niesiesz ten przedmiot +2 \uf496!'
+        }
+
+    }
+})
+
 //----Keep all cards in one list-----//
-const cards = [card1, card2]
-let cardIndex = 0
+const cards = [bossCard, questCard, itemCard, bossItemCard]
+let cardIndex = 3
 let currentCard = cards[cardIndex]
 
 //------------canvas setup---------------
@@ -529,8 +707,8 @@ buttonPrevious.addEventListener('click', (e) => {
     } else {
         cardIndex -= 1
     }
+    canvas.clear();
     currentCard = cards[cardIndex]
-
     getCardPrinter(canvas, currentCard)
         .print(currentCard)
 })
@@ -542,7 +720,7 @@ buttonNext.addEventListener('click', (e) => {
     } else {
         cardIndex += 1
     }
-
+    canvas.clear();
     currentCard = cards[cardIndex]
     getCardPrinter(canvas, currentCard)
         .print(currentCard)
