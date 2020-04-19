@@ -1,7 +1,8 @@
 
-export {CardTemplate}
+export { CardTemplate }
 
 class CardTemplate {
+    id = ''
     type = 'none'
     deck = 'draft'
     dimensions = {

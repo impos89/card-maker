@@ -3,6 +3,7 @@ import { CardTemplate } from './cardTemplate'
 export { CCCardTemplate }
 
 class CCCardTemplate extends CardTemplate {
+    id = 'cc01'
     type = 'cc'
     backgroundColor = '#fec657'
     labelColor = '#fec657'

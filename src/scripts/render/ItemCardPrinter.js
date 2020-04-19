@@ -1,20 +1,25 @@
-import { ItemCardTemplate } from '../templates/itemCardTemplate';
 import { CardPrinter } from './cardPrinter'
+import { ItemCardTemplate } from '../templates/itemCardTemplate';
+import { getTemplateById } from '../templates/templateFactory'
 
 export { ItemCardPrinter }
 class ItemCardPrinter extends CardPrinter {
     print = (card) => {
+
         if (!card instanceof ItemCardTemplate) {
             console.error("Current card" + card + " is not an instance of ItemCardTemplate")
         }
-        this.drawBackground(card.template.backgroundColor)
-        this.drawBorder(card.template.borderProperties)
-        this.drawLabel(card.template.type, 30, 50, 60, card.template.labelColor)
 
-        this.drawTextWithIcons(card.data.stats.bonus, { left: 0, top: 100, fontSize: 35, width: card.template.dimensions.width, height: 400, textAlign: "center" })
-        this.drawTextWithIcons(card.title, { left: 0, top: 210, fontSize: 35, width: card.template.dimensions.width, height: 400, textAlign: "center" })
-        this.drawCirclePortrait(card.data.portrait, { left: card.template.dimensions.width / 2 - 125, top: 250 })
-        this.drawTextWithIcons(card.data.descriptions[0], { left: 0, top: 520, fontSize: 25, width: card.template.dimensions.width, height: 100, textAlign: "center" })
+        const template = getTemplateById(card.template)
+
+        this.drawBackground(template.backgroundColor)
+        this.drawBorder(template.borderProperties)
+        this.drawLabel(template.type, 30, 50, 60, template.labelColor)
+
+        this.drawTextWithIcons(card.data.stats.bonus, { left: 0, top: 100, fontSize: 35, width: template.dimensions.width, height: 400, textAlign: "center" })
+        this.drawTextWithIcons(card.title, { left: 0, top: 210, fontSize: 35, width: template.dimensions.width, height: 400, textAlign: "center" })
+        this.drawCirclePortrait(card.data.portrait, { left: template.dimensions.width / 2 - 125, top: 250 })
+        this.drawTextWithIcons(card.data.descriptions[0], { left: 0, top: 520, fontSize: 25, width: template.dimensions.width, height: 100, textAlign: "center" })
         this.drawStatsBox(card.data.stats)
 
         let types = card.data.stats.type
@@ -23,8 +28,8 @@ class ItemCardPrinter extends CardPrinter {
             })
             .join('\n')
         this.drawTextWithIcons(types, { left: 0, top: 850, fontSize: 35, width: 200, height: 100 })
-        this.drawLabel(card.template.deck, 945, 10, 30, card.template.labelColor)
-        this.drawTextWithIcons('' + card.data.stats.value + ' sztuk złota', { left: 150, top: 900, fontSize: 35, width: card.template.dimensions.width, height: 100, textAlign: 'right' })
+        this.drawLabel(template.deck, 945, 10, 30, template.labelColor)
+        this.drawTextWithIcons('' + card.data.stats.value + ' sztuk złota', { left: 150, top: 900, fontSize: 35, width: template.dimensions.width, height: 100, textAlign: 'right' })
         this.renderAll()
     }
 

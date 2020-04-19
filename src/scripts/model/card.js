@@ -4,7 +4,7 @@ class Card {
     constructor(obj) {
         this.id = obj.id || 0
         this.title = obj.title || 'unnamed'
-        this.template = obj.template || new CardTemplate()
+        this.template = obj.template || ''
         this.data = {
             portrait: '../public/assets/images/no_image.png',
             stats: {

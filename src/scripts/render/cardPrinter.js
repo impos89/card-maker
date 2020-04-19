@@ -11,9 +11,12 @@ class CardPrinter {
         '\uf496', /*lock*/
     ]
 
-    constructor(canvas, dimensions) {
+    constructor(canvas) {
         this.canvas = canvas
-        this.dimensions = dimensions
+        this.dimensions = {
+            width: this.canvas.getWidth(),
+            height: this.canvas.getHeight()
+        }
     }
 
     print = (card) => { console.log("Abstract card printer - print called does nothing") }

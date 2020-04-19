@@ -9,13 +9,14 @@ import { QuestCardTemplate } from './templates/questCardTemplate'
 import { CCCardTemplate } from './templates/ccCardTemplate'
 import { Card } from './model/card'
 import { getCardPrinter } from './render/cardPrinterFactory'
+import { CardTemplate } from './templates/cardTemplate'
 
 //-----------demo card - Bheg------------------
 let bossCard = new Card
     ({
         id: 1,
         title: 'BHEG',
-        template: new BossCardTemplate(),
+        template: 'boss01',
         data: {
             portrait: '../public/assets/images/1.png',
             stats: {
@@ -33,7 +34,7 @@ let bossCard = new Card
 let questCard = new Card({
     id: 2,
     title: 'POMÓŻ INNEMU GRACZOWI',
-    template: new QuestCardTemplate(),
+    template: 'quest01',
     data: {
         portrait: '../public/assets/images/question_mark.png',
         stats: {
@@ -46,7 +47,7 @@ let questCard = new Card({
 let itemCard = new Card({
     id: 3,
     title: 'CIEPLUTKIE KALESONIKI',
-    template: new ItemCardTemplate(),
+    template: 'item01',
     data: {
         portrait: '../public/assets/images/item_1.png',
         stats: {
@@ -68,7 +69,7 @@ let itemCard = new Card({
 let bossItemCard = new Card({
     id: 4,
     title: 'ZBROJA Z DYWANU',
-    template: new BossItemCardTemplate(),
+    template: 'bossItem01',
     data: {
         portrait: '../public/assets/images/item_2.png',
         stats: {
@@ -86,6 +87,8 @@ let bossItemCard = new Card({
     }
 })
 
+
+
 //----Keep all cards in one list-----//
 const cards = [bossCard, questCard, itemCard, bossItemCard]
 let cardIndex = 3
@@ -93,8 +96,9 @@ let currentCard = cards[cardIndex]
 
 //------------canvas setup---------------
 export let canvas = new fabric.Canvas('c')
-canvas.setWidth(currentCard.template.dimensions.width)
-canvas.setHeight(currentCard.template.dimensions.height)
+export const dimensions = new CardTemplate().dimensions
+canvas.setWidth(dimensions.width)
+canvas.setHeight(dimensions.height)
 
 //-------------print card----------------
 let printer = getCardPrinter(canvas, currentCard)

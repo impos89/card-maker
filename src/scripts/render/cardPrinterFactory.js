@@ -1,19 +1,25 @@
 import { BossCardPrinter } from './bossCardPrinter'
 import { QuestCardPrinter } from './questCardPrinter'
 import { ItemCardPrinter } from './itemCardPrinter'
+import { CCCardPrinter } from './ccCardPrinter'
+import { getTemplateById } from '../templates/templateFactory'
 
 export { getCardPrinter }
 
 const getCardPrinter = (canvas, card) => {
-    const bossCardPrinter = new BossCardPrinter(canvas, card.template.dimensions)
-    const questCardPrinter = new QuestCardPrinter(canvas, card.template.dimensions)
-    const itemCardPrinter = new ItemCardPrinter(canvas, card.template.dimensions)
+    const bossCardPrinter = new BossCardPrinter(canvas)
+    const questCardPrinter = new QuestCardPrinter(canvas)
+    const itemCardPrinter = new ItemCardPrinter(canvas)
+    const ccCardPrinter = new CCCardPrinter(canvas)
 
-    switch (card.template.type) {
+    const type = getTemplateById(card.template).type
+    console.debug('Getting printer for template of type=[%s]', type)
+    switch (type) {
         case 'boss': return bossCardPrinter
         case 'quest': return questCardPrinter
         case 'item': return itemCardPrinter
         case 'boss item': return itemCardPrinter
-        default: console.error('Unhandled card type: ' + card.template.type)
+        case 'cc': return ccCardPrinter
+        default: console.error('Unhandled unknown card template type.')
     }
 }

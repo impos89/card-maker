@@ -3,6 +3,7 @@ import { CardTemplate } from './cardTemplate'
 export { QuestCardTemplate }
 
 class QuestCardTemplate extends CardTemplate {
+    id = 'quest01'
     type = 'quest'
     backgroundColor = '#fec657'
     labelColor = '#fec657'

@@ -1,18 +1,22 @@
 import { CardPrinter } from './cardPrinter'
 import { BossCardTemplate } from '../templates/bossCardTemplate'
+import { getTemplateById } from '../templates/templateFactory'
 
 export { BossCardPrinter }
 
 class BossCardPrinter extends CardPrinter {
     print = (card) => {
         if (!card instanceof BossCardTemplate) {
-            console.error("Current card" + card + " is not an instance of BossCardTemplate")
+            console.error("Current card" + card + " is not an instance of" + BossCardTemplate.constructor.name)
         }
-        this.drawBackground(card.template.backgroundColor)
-        this.drawBorder(card.template.borderProperties)
-        this.drawLabel(card.template.type, 20, 50, 60, card.template.labelColor)
+        const type = BossCardTemplate
+        const template = getTemplateById(card.template)
+
+        this.drawBackground(template.backgroundColor)
+        this.drawBorder(template.borderProperties)
+        this.drawLabel(template.type, 20, 50, 60, template.labelColor)
         this.drawCirclePortrait(card.data.portrait, { left: 45, top: 90 })
-        this.drawLabel(card.template.deck, 965, 10, 30, card.template.labelColor)
+        this.drawLabel(template.deck, 965, 10, 30, template.labelColor)
         this.drawBossName(card.title)
         this.drawDamageBox(card.data.stats)
         this.drawLootBox(card.data.stats.reward)
