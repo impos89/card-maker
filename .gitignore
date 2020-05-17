@@ -1,3 +1,5 @@
 node_modules
+.idea
 .vscode
-public/assets/scripts/bundle.js
+public/assets/scripts/
+public/assets/styles/

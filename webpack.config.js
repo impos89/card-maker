@@ -28,6 +28,7 @@ module.exports = {
     filename: 'assets/scripts/bundle.js'
   },
   module: {
+
     // Array of rules that tells Webpack how the modules (output)
     // will be created
     rules: [
@@ -38,6 +39,11 @@ module.exports = {
         test: /\.(js)$/,
         exclude: /node_modules/,
         use: ['babel-loader']
+      },
+      {
+        test: /\.tsx?$/,
+        exclude: /node_modules/,
+        use: ['babel-loader', 'ts-loader'], // Loaders always execute right to left
       },
       {
         // Look for Sass files and process them according to the
@@ -114,6 +120,9 @@ module.exports = {
       }
     ]
 
+  },
+  resolve: {
+    extensions: [ '.tsx', '.ts', '.js' ],
   },
   plugins: [
     // Configuration options for MiniCssExtractPlugin. Here I'm only

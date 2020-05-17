@@ -1,137 +1,82 @@
 'use strict'
 import { fabric } from 'fabric'
 import '@fortawesome/fontawesome-free/js/fontawesome'
-
-import { BossCardTemplate } from './templates/bossCardTemplate'
-import { BossItemCardTemplate } from './templates/bossItemCardTemplate'
-import { ItemCardTemplate } from './templates/itemCardTemplate'
-import { QuestCardTemplate } from './templates/questCardTemplate'
-import { CCCardTemplate } from './templates/ccCardTemplate'
 import { Card } from './model/card'
 import { getCardPrinter } from './render/cardPrinterFactory'
 import { CardTemplate } from './templates/cardTemplate'
-
-//-----------demo card - Bheg------------------
-let bossCard = new Card
-    ({
-        id: 1,
-        title: 'BHEG',
-        template: 'boss01',
-        data: {
-            portrait: '../public/assets/images/1.png',
-            stats: {
-                playerNumbers: ['3', '4', '5-6', '7-8'],
-                dps: ['35', '50', '75', '100'],
-                hp: ['45', '60', '90', '120'],
-                miserableEnd: 'Dodatkowe 8 Ran, Wszyscy tracą 2 poziomy',
-                effect1: '+2 \uf6de za każdy przedmiot na +0, walczących graczy',
-                reward: 'Boss Item, TradePack, kryształ, czar, 2 skarby dla gracza od drzwi. Poziom +2/+1'
-            }
-        }
-    })
-
-//-----------demo card - Quest------------------
-let questCard = new Card({
-    id: 2,
-    title: 'POMÓŻ INNEMU GRACZOWI',
-    template: 'quest01',
-    data: {
-        portrait: '../public/assets/images/question_mark.png',
-        stats: {
-            reward: '+1 poziom'
-        }
-    }
-})
-
-//-----------demo card - Item------------------
-let itemCard = new Card({
-    id: 3,
-    title: 'CIEPLUTKIE KALESONIKI',
-    template: 'item01',
-    data: {
-        portrait: '../public/assets/images/item_1.png',
-        stats: {
-            value: 600,
-            type: ['Zbroja', 'Duża'],
-            bonus: 'Bonus +1\n Nie dla Mage',
-            strength: 2,
-            power: 0,
-            shield: 3
-        },
-        descriptions: {
-            0: 'Zobacz jak na Tobie leżą!'
-        }
-
-    }
-})
-
-//-----------demo card - Boss Item------------------
-let bossItemCard = new Card({
-    id: 4,
-    title: 'ZBROJA Z DYWANU',
-    template: 'bossItem01',
-    data: {
-        portrait: '../public/assets/images/item_2.png',
-        stats: {
-            value: 600,
-            type: ['Zbroja'],
-            bonus: 'Bonus +1',
-            strength: 1,
-            power: 1,
-            shield: 2
-        },
-        descriptions: {
-            0: 'Kiedy niesiesz ten przedmiot +2 \uf496!'
-        }
-
-    }
-})
+import { downloadCardsAsJson } from './model/cardStorage'
 
 
-
-//----Keep all cards in one list-----//
-const cards = [bossCard, questCard, itemCard, bossItemCard]
-let cardIndex = 3
-let currentCard = cards[cardIndex]
-
-//------------canvas setup---------------
 export let canvas = new fabric.Canvas('c')
 export const dimensions = new CardTemplate().dimensions
-canvas.setWidth(dimensions.width)
-canvas.setHeight(dimensions.height)
 
-//-------------print card----------------
-let printer = getCardPrinter(canvas, currentCard)
-printer.print(cards[cardIndex])
+let currentCard = null
+let currentCardIndex = 0
+let cards = []
 
-//---- selection button handlers
-var buttonPrevious = document.getElementById("button_previous")
-buttonPrevious.addEventListener('click', (e) => {
-    if (cardIndex == 0) {
-        cardIndex = cards.length - 1
-    } else {
-        cardIndex -= 1
+function run() {
+
+    //------------canvas setup---------------
+    canvas.setWidth(dimensions.width)
+    canvas.setHeight(dimensions.height)
+
+
+    function loadCard(cardIndex) {
+        let currentCard = cards[cardIndex]
+        //-------------print card----------------
+        let printer = getCardPrinter(canvas, currentCard)
+        printer.print(currentCard)
     }
-    canvas.clear();
-    currentCard = cards[cardIndex]
-    getCardPrinter(canvas, currentCard)
-        .print(currentCard)
-})
 
-var buttonNext = document.getElementById("button_next")
-buttonNext.addEventListener('click', (e) => {
-    if (cardIndex == cards.length - 1) {
-        cardIndex = 0
-    } else {
-        cardIndex += 1
+    //---- selection button handlers
+    const buttonPrevious = document.getElementById("button_previous")
+    buttonPrevious.addEventListener('click', (e) => {
+        if (currentCardIndex == 0) {
+            currentCardIndex = cards.length - 1
+        } else {
+            currentCardIndex -= 1
+        }
+        canvas.clear();
+        currentCard = cards[currentCardIndex]
+        getCardPrinter(canvas, currentCard)
+            .print(currentCard)
+    })
+
+    const buttonNext = document.getElementById("button_next")
+    buttonNext.addEventListener('click', (e) => {
+        if (currentCardIndex == cards.length - 1) {
+            currentCardIndex = 0
+        } else {
+            currentCardIndex += 1
+        }
+        canvas.clear();
+        currentCard = cards[currentCardIndex]
+        getCardPrinter(canvas, currentCard)
+            .print(currentCard)
+    })
+
+    var reader = new FileReader();
+    reader.onload = function (evt) {
+        cards = JSON.parse(evt.target.result);
+        loadCard(0)
     }
-    canvas.clear();
-    currentCard = cards[cardIndex]
-    getCardPrinter(canvas, currentCard)
-        .print(currentCard)
-})
 
-// TODO remove not common part - images, text from template and use it later
+    const uploadInputElement = document.getElementById("uploadInput")
+    uploadInputElement.addEventListener("change", (evt) => {
+        let files = evt.currentTarget.files[0]
+        console.log("in load file " + cards)
+        reader.readAsText(files, 'UTF-8')
+    }, false);
+
+    const download_cards = document.getElementById("download_cards")
+    download_cards.addEventListener('click', () => {
+        downloadCardsAsJson(cards)
+    }, false);
+}
+
+run()
+
+
 
 /*
     A plan is following:
@@ -140,3 +85,9 @@ buttonNext.addEventListener('click', (e) => {
         3. user may choose card specific properties and mechanics - including special effects
         4. user may save a card as a draft or public to existing decks - (see label on the bottom)
 */
+
+
+//TODO:
+// 1. Add application loader ? before showing cards to wait until fonts (and other components) are loaded and ready to use.
+// 2. Replace urls of portraits from: '../public/assets/images/item_2.png', to encoded URLs - prepare them to be accessible from server.
+// 3. TODO remove not common part - images, text from template and use it later

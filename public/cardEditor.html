@@ -12,7 +12,7 @@
     <style type="text/css">
         canvas {
             border: 1px solid black;
-            
+
             width: 650px;
             height: 1016px;
             font-family: 'Font Awesome 5 Free';
@@ -33,7 +33,7 @@
         }
 
         .container>canvas {
-            
+
             position: absolute;
             top: 0;
             left: 0;
@@ -45,12 +45,16 @@
 <body>
     <canvas id="c"></canvas>
     <div id="ui">
-        <button id="button_previous">Poprzedni</button> ... <button id="button_next">Następny</button>
-    </div>
+        <!-- upload file-->
+        <div>
+            <input id="uploadInput" type="file" name="cards" accept=".json">
+            <div id="fileContents" styles="display:none"></div>
+        </div>
+        <!--Navigation Buttons -->
+        <div><button id="button_previous">Poprzednia Karta</button> ... <button id="button_next">Następna Karta</button></div>
 
-    <div style="display:none;">
-        <img id="source" src="./assets/images/1.png" width="300" height="227">
-        <img id="fists_img" src="./assets/images/fists.png" width="300" height="227">
+        <!-- Download cards -->
+        <div><button id="download_cards">Zapisz karty</button></div>
     </div>
     <script src="./assets/scripts/bundle.js"></script>
 </body>
