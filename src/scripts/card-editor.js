@@ -1,11 +1,14 @@
 'use strict'
 import { fabric } from 'fabric'
 import '@fortawesome/fontawesome-free/js/fontawesome'
-import { Card } from './model/card'
 import { getCardPrinter } from './render/cardPrinterFactory'
 import { CardTemplate } from './templates/cardTemplate'
 import { downloadCardsAsJson } from './model/cardStorage'
+import { $, jQuery } from 'jquery';
+import "../styles/card-editor.scss"
 
+window.$ = $;
+window.jQuery = jQuery;
 
 export let canvas = new fabric.Canvas('c')
 export const dimensions = new CardTemplate().dimensions
@@ -72,6 +75,11 @@ function run() {
     download_cards.addEventListener('click', () => {
         downloadCardsAsJson(cards)
     }, false);
+    
+    // $(".loader-wrapper").fadeOut("slow");
+    // $(window).on("load", () => {
+        
+    // });
 }
 
 run()
@@ -88,6 +96,8 @@ run()
 
 
 //TODO:
-// 1. Add application loader ? before showing cards to wait until fonts (and other components) are loaded and ready to use.
-// 2. Replace urls of portraits from: '../public/assets/images/item_2.png', to encoded URLs - prepare them to be accessible from server.
-// 3. TODO remove not common part - images, text from template and use it later
+// 1. For now all css files are included to html body (included by using import in js file). Find a way to separate them because we want to have separate styles on separate pages.
+// 2. Add application loader ? before showing cards to wait until fonts (and other components) are loaded and ready to use.
+// 3. Replace urls of portraits from: '../public/assets/images/item_2.png', to encoded URLs - prepare them to be accessible from server.
+// 4. TODO remove not common part - images, text from template and use it later
+// 5. recode application to use typescript only

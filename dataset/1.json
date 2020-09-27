@@ -1,0 +1,167 @@
+[
+    {
+        "id": 1,
+        "title": "BHEG",
+        "template": "boss01",
+        "data": {
+            "portrait": "../public/assets/images/1.png",
+            "stats": {
+                "playerNumbers": [
+                    "3",
+                    "4",
+                    "5-6",
+                    "7-8"
+                ],
+                "dps": [
+                    "35",
+                    "50",
+                    "75",
+                    "100"
+                ],
+                "hp": [
+                    "45",
+                    "60",
+                    "90",
+                    "120"
+                ],
+                "miserableEnd": "Dodatkowe 8 Ran, Wszyscy tracą 2 poziomy",
+                "effect1": "+2  za każdy przedmiot na +0, walczących graczy",
+                "reward": "Boss Item, TradePack, kryształ, czar, 2 skarby dla gracza od drzwi. Poziom +2/+1",
+                "bonus": "No bonus",
+                "strength": 0,
+                "power": 0,
+                "shield": 0,
+                "type": [
+                    "Zbroja",
+                    "Duża"
+                ],
+                "value": 0
+            }
+        }
+    },
+    {
+        "id": 2,
+        "title": "POMÓŻ INNEMU GRACZOWI",
+        "template": "quest01",
+        "data": {
+            "portrait": "../public/assets/images/question_mark.png",
+            "stats": {
+                "playerNumbers": [
+                    "3",
+                    "4",
+                    "5-6",
+                    "7-8"
+                ],
+                "dps": [
+                    "0",
+                    "0",
+                    "0",
+                    "0"
+                ],
+                "hp": [
+                    "0",
+                    "0",
+                    "0",
+                    "0"
+                ],
+                "miserableEnd": "No effect",
+                "effect1": "No effect",
+                "reward": "+1 poziom",
+                "bonus": "No bonus",
+                "strength": 0,
+                "power": 0,
+                "shield": 0,
+                "type": [
+                    "Zbroja",
+                    "Duża"
+                ],
+                "value": 0
+            }
+        }
+    },
+    {
+        "id": 3,
+        "title": "CIEPLUTKIE KALESONIKI",
+        "template": "item01",
+        "data": {
+            "portrait": "../public/assets/images/item_1.png",
+            "stats": {
+                "playerNumbers": [
+                    "3",
+                    "4",
+                    "5-6",
+                    "7-8"
+                ],
+                "dps": [
+                    "0",
+                    "0",
+                    "0",
+                    "0"
+                ],
+                "hp": [
+                    "0",
+                    "0",
+                    "0",
+                    "0"
+                ],
+                "miserableEnd": "No effect",
+                "effect1": "No effect",
+                "reward": "No reward",
+                "bonus": "Bonus +1\n Nie dla Mage",
+                "strength": 2,
+                "power": 0,
+                "shield": 3,
+                "type": [
+                    "Zbroja",
+                    "Duża"
+                ],
+                "value": 600
+            },
+            "descriptions": {
+                "0": "Zobacz jak na Tobie leżą!"
+            }
+        }
+    },
+    {
+        "id": 4,
+        "title": "ZBROJA Z DYWANU",
+        "template": "bossItem01",
+        "data": {
+            "portrait": "../public/assets/images/item_2.png",
+            "stats": {
+                "playerNumbers": [
+                    "3",
+                    "4",
+                    "5-6",
+                    "7-8"
+                ],
+                "dps": [
+                    "0",
+                    "0",
+                    "0",
+                    "0"
+                ],
+                "hp": [
+                    "0",
+                    "0",
+                    "0",
+                    "0"
+                ],
+                "miserableEnd": "No effect",
+                "effect1": "No effect",
+                "reward": "No reward",
+                "bonus": "Bonus +1",
+                "strength": 1,
+                "power": 1,
+                "shield": 2,
+                "type": [
+                    "Zbroja"
+                ],
+                "value": 600
+            },
+            "descriptions": {
+                "0": "Kiedy niesiesz ten przedmiot +2 !"
+            }
+        }
+    }
+]

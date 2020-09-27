@@ -7,7 +7,7 @@
     "dev:assets": "webpack --watch",
     "dev:start": "live-server --open=./public/ --host=localhost --watch=./public/",
     "dev": "npm-run-all -p dev:*",
-    "build": "cross-env NODE_ENV=production webpack"
+    "build": "cross-env NODE_ENV=development webpack"
   },
   "devDependencies": {
     "@babel/core": "^7.8.4",
@@ -37,6 +37,8 @@
     "@babel/plugin-proposal-class-properties": "^7.8.3",
     "@fortawesome/fontawesome-free": "^5.12.1",
     "fabric": "^4.0.0-beta.7",
+    "jquery": "^3.5.1",
+    "style-loader": "^1.2.1",
     "ts-loader": "^7.0.4",
     "typescript": "^3.9.2"
   }

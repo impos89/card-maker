@@ -3,32 +3,21 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const devMode = process.env.NODE_ENV !== 'production';
+console.log(devMode + " " + process.env.NODE_ENV);
 module.exports = {
-  // Tells Webpack which built-in optimizations to use
-  // In 'production' mode, Webpack will minify and uglify our JS code
-  // If you leave this out, Webpack will default to 'production'
   mode: devMode ? 'development' : 'production',
-  // Webpack needs to know where to start the bundling process,
-  // so we define the main JS and Sass files, both under
-  // the './src' directory
   entry: [
     './src/scripts/main.js',
     './src/scripts/card-editor.js',
-    './src/styles/main.scss'],
+    ],
   // This is where we define the path where Webpack will place
   // the bundled JS file
   output: {
     path: path.resolve(__dirname, 'public'),
-    // Specify the base path for all the assets within your
-    // application. This is relative to the output path, so in
-    // our case it will be ./public/assets
     publicPath: '/assets',
-    // The name of the output bundle. Path is also relative
-    // to the output path
     filename: 'assets/scripts/bundle.js'
   },
   module: {
-
     // Array of rules that tells Webpack how the modules (output)
     // will be created
     rules: [
@@ -48,19 +37,25 @@ module.exports = {
       {
         // Look for Sass files and process them according to the
         // rules specified in the different loaders
-        test: /\.(sa|sc)ss$/,
+        // test: /\.(sa|sc)ss$/,
+        exclude: /node_modules/,
+        test: /\.s?css$/,
         // Use the following loaders from right-to-left, so it will
         // use sass-loader first and ending with MiniCssExtractPlugin
         use: [
           {
-            // Extracts the CSS into a separate file and uses the
-            // defined configurations in the 'plugins' section
-            loader: MiniCssExtractPlugin.loader
+            loader: "style-loader"
           },
+          // {
+          //   // Extracts the CSS into a separate file and uses the
+          //   // defined configurations in the 'plugins' section
+          //   loader: MiniCssExtractPlugin.loader,
+          // },
           {
             // Interprets CSS
             loader: 'css-loader',
             options: {
+              // 2 => enables postcss-loader, sass-loader
               importLoaders: 2
             }
           },
@@ -129,7 +124,8 @@ module.exports = {
     // indicating what the CSS outputted file name should be and
     // the location
     new MiniCssExtractPlugin({
-      filename: 'assets/styles/main.css'
+      filename: 'assets/styles/[name].css',
+      chunkFilename: "[id].css"
     })
   ]
 };

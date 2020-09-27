@@ -5,57 +5,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="./assets/styles/main.css">
-    <title>Canvas Resize</title>
-
-
-    <style type="text/css">
-        canvas {
-            border: 1px solid black;
-
-            width: 650px;
-            height: 1016px;
-            font-family: 'Font Awesome 5 Free';
-        }
-
-        body {
-            margin: 0;
-        }
-
-        div#ui {
-            position: absolute;
-            margin-top: -1016px;
-            margin-left: 700px;
-        }
-
-        .container {
-            position: relative;
-        }
-
-        .container>canvas {
-
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-    </style>
-
+    <title>Edytor Kart</title>
 </head>
 
 <body>
-    <canvas id="c"></canvas>
     <div id="ui">
         <!-- upload file-->
         <div>
             <input id="uploadInput" type="file" name="cards" accept=".json">
-            <div id="fileContents" styles="display:none"></div>
+            <div id="fileContents" style="display:none"></div>
         </div>
-        <!--Navigation Buttons -->
-        <div><button id="button_previous">Poprzednia Karta</button> ... <button id="button_next">Następna Karta</button></div>
+    <!--Navigation Buttons -->
+    <div><button id="button_previous">Poprzednia Karta</button> <span> < ... > </span> <button id="button_next">Następna Karta</button></div>
 
         <!-- Download cards -->
         <div><button id="download_cards">Zapisz karty</button></div>
     </div>
+    <canvas id="c"></canvas>
     <script src="./assets/scripts/bundle.js"></script>
 </body>
 
